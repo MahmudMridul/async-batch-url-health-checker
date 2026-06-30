@@ -1,0 +1,10 @@
+https://google.com
+http://example.com
+https://site_name.com
+www.missing-protocol.org
+https://github.com
+https://invalid-domain...com
+http://localhost:8080/dashboard
+https://2001:db8::1
+http://example.com:99999
+https://wikipedia.org

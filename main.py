@@ -1,5 +1,6 @@
 from app_logger import AppLogger
 from collections.abc import Generator
+from url import URL
 
 logger = AppLogger(config_path="logging_config.json", logger_name=__name__).get_logger()
 
@@ -20,7 +21,7 @@ def main():
     generator = read_url_list(FILE)
 
     for url in generator:
-        print(url)
+        entry = URL(url=url)
 
 
 if __name__ == "__main__":
