@@ -1,5 +1,7 @@
-import logging
+from app_logger import AppLogger
 from collections.abc import Generator
+
+logger = AppLogger(config_path="logging_config.json", logger_name=__name__).get_logger()
 
 def read_url_list(path : str) -> Generator[str, None, None]:
     try: 
@@ -7,10 +9,10 @@ def read_url_list(path : str) -> Generator[str, None, None]:
             for line in file:
                 yield line.rstrip("\n")
     except FileNotFoundError as e:
-        logging.error(f"File not found: {e}")
+        logger.error(f"File not found: {e}")
         raise
     except OSError as e:
-        logging.error(f"OS error: {e}")
+        logger.error(f"OS error: {e}")
         raise
 
 def main():
