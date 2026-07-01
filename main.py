@@ -1,6 +1,7 @@
 from app_logger import AppLogger
 from collections.abc import Generator
 from pydantic import ValidationError, HttpUrl
+import httpx
 
 logger = AppLogger(config_path="logging_config.json", logger_name=__name__).get_logger()
 
@@ -16,6 +17,12 @@ def read_url_list(path: str) -> Generator[str, None, None]:
     except OSError as e:
         logger.error(f"OS error: {e}")
         raise
+
+
+async def fetch_url(url: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url=url)
+        logger.info(f"Status code: {response.status_code}")
 
 
 def main():
