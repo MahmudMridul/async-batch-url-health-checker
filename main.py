@@ -48,10 +48,12 @@ async def main():
             url = HttpUrl(url=item)
             valid_urls.append(str(url))
         except ValidationError as e:
-            logger.error(f"Validation error for url {url}.\n{e}")
+            logger.error(f"Validation error for url {item}.\n{e}")
 
     tasks = [fetch_url(url) for url in valid_urls]
-    asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks)
+    print("="*50)
+    print(results)
 
 
 if __name__ == "__main__":
