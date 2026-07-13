@@ -21,14 +21,15 @@ def read_url_list(path: str) -> Generator[str, None, None]:
         raise
 
 
-async def fetch_url(url: str, client: httpx.AsyncClient):
+async def fetch_url(url: str, client: httpx.AsyncClient, semaphore: asyncio.Semaphore):
     status = None
     error = None
     start = time.perf_counter()
     try:
-        response = await client.get(url=url)
-        # This raises HTTPStatusError for 4xx and 5xx responses
-        response.raise_for_status()
+        async with semaphore:
+            response = await client.get(url=url)
+            # This raises HTTPStatusError for 4xx and 5xx responses
+            response.raise_for_status()
         status = response.status_code
         logger.info(f"Success: Status code {response.status_code}")
     except httpx.HTTPStatusError as e:
@@ -53,10 +54,12 @@ async def fetch_url(url: str, client: httpx.AsyncClient):
 async def main():
     FILE = "url_list.txt"
     valid_urls = []
+    semaphore = asyncio.Semaphore(5)
     try:
         generator = read_url_list(FILE)
     except Exception as e:
         logger.error(f"Something went wrong: {e}")
+        return
 
     for item in generator:
         try:
@@ -66,7 +69,7 @@ async def main():
             logger.error(f"Validation error for url {item}.\n{e}")
 
     async with httpx.AsyncClient() as client:
-        tasks = [fetch_url(url, client=client) for url in valid_urls]
+        tasks = [fetch_url(url, client=client, semaphore=semaphore) for url in valid_urls]
         results = await asyncio.gather(*tasks)
     
     for items in results:
